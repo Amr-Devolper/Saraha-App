@@ -64,6 +64,11 @@ const userSchema = new Schema(
     toJSON: {
       virtuals: true,
       getters: true,
+      transform(doc , ret){
+        delete ret.id
+        delete ret.password
+        return ret
+      }
     },
     toObject: {
       virtuals: true,
