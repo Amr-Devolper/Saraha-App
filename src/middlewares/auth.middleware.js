@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { userModel } from "../DB/models/user.model.js";
 import { errorRes } from "../utils/error.handle.js";
+// import { userRole } from "../modules/User/user.types.js"
 
 export const tokenEnum = {
   access: "access",
@@ -67,3 +68,18 @@ export const decodeToken = async ({
     user,
   };
 };
+
+
+export const authorization = (...roles)=>{
+  
+  return (req,res,next)=>{
+    console.log({roles , userRole : req.user.role})
+    if(!roles.includes(req.user.role)){
+      errorRes({
+        msg: "not authorized",
+        statusCode: 401
+      })
+    }
+    next()
+  }
+}

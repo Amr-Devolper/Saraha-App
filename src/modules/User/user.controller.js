@@ -1,10 +1,11 @@
-import {Router} from "express"
+import { Router } from "express"
+import { auth, authorization } from "../../middlewares/auth.middleware.js"
+import { validation } from "../../middlewares/validation.middleware.js"
 import { errorRes } from "../../utils/error.handle.js"
 import { successRes } from "../../utils/success.res.js"
 import { loginService, refreshTokenService, signupService } from "./user.service.js"
-import { auth, tokenEnum } from "../../middlewares/auth.middleware.js"
-import jwt from "jsonwebtoken"
-import { userModel } from "../../DB/models/user.model.js"
+import { RoleEnum } from "./user.types.js"
+import { signupSchema } from "./user.validation.js"
 const router = Router()
 
 
@@ -19,6 +20,7 @@ export const routes = {
 
 
 router.get(routes.base, (req,res)=>{
+    
     errorRes({msg : "error from hello api", statusCode : 400})
 
     successRes({res,msg:"user module"})
@@ -26,7 +28,10 @@ router.get(routes.base, (req,res)=>{
 
 
 
-router.post(routes.signup, async (req,res)=>{
+router.post(routes.signup,validation(signupSchema), async (req,res)=>{
+
+    
+
     const {data} = await signupService(req.body)
 
     successRes({res, msg: "created successfully", status : 201})
@@ -45,7 +50,7 @@ router.post(routes.login, async (req,res)=>{
 })
 
 
-router.get(routes.me, auth , async (req,res)=>{
+router.get(routes.me, auth ,authorization(RoleEnum.user), async (req,res)=>{
 
     const user = req.user
     return successRes({

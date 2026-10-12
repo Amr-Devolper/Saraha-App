@@ -24,6 +24,7 @@ export const bootstrap = async () => {
     res.status(statusCode).json({
       errMsg: err.message,
       status: statusCode,
+      errOptions : err.cause?.options
     });
   });
 

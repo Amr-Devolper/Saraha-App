@@ -2,6 +2,8 @@ import { userModel } from "../../DB/models/user.model.js";
 import { errorRes } from "../../utils/error.handle.js";
 import { decodeToken , tokenEnum } from "../../middlewares/auth.middleware.js";
 import jwt from "jsonwebtoken";
+import {createHash, verifyHash} from "../../utils/security/hash.js"
+
 export const signupService = async ({
   fullname,
   email,
@@ -31,7 +33,7 @@ export const signupService = async ({
   const user = await userModel.create({
     fullname,
     email,
-    password,
+    password: await createHash(password, "argon2"),
     gender,
     phone,
     bio,
@@ -56,7 +58,7 @@ export const loginService = async (identifier, password) => {
     });
   }
 
-  if (user.password != password) {
+  if (!await verifyHash(password, user.password)){
     errorRes({
       msg: "invalid credentials",
       statusCode: 400,
